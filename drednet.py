@@ -2,6 +2,7 @@
 
 import cPickle
 import gzip
+import os
 import sys
 import time
 from pprint import pprint
@@ -40,18 +41,6 @@ class DredNetLayer(object):
         activation=T.tanh
         #todo: replace activation func with the rectifier
 
-        # `W` is initialized with `W_values` which is uniformely sampled
-        # from sqrt(-6./(n_in+n_hidden)) and sqrt(6./(n_in+n_hidden))
-        # for tanh activation function
-        # the output of uniform if converted using asarray to dtype
-        # theano.config.floatX so that the code is runable on GPU
-        # Note : optimal initialization of weights is dependent on the
-        #        activation function used (among other things).
-        #        For example, results presented in [Xavier10] suggest that you
-        #        should use 4 times larger initial weights for sigmoid
-        #        compared to tanh
-        #        We have no info for other function, so we use the same as
-        #        tanh.
         if W is None:
             W_values = numpy.asarray(rng.uniform(
                     low=-numpy.sqrt(6. / (n_in + n_out)),
@@ -79,7 +68,7 @@ class DredNetLayer(object):
         self.params = [self.W, self.b]
 
 
-def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist.pkl.gz', nkerns=[20, 50], batch_size=500):
+def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz', nkerns=[20, 50], batch_size=5):
     print('read ' + input)
     rng = numpy.random.RandomState(23455)
 
@@ -187,8 +176,7 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist.pkl.gz', nke
 
             iter = (epoch - 1) * n_train_batches + minibatch_index
 
-            if iter % 100 == 0:
-            #if iter % 10 == 0:
+            if iter % 10 == 0:
                 print 'training @ iter = ', iter
             cost_ij = train_model(minibatch_index)
 
