@@ -8,6 +8,8 @@ from pprint import pprint
 import numpy
 import theano
 
+sys.path.append('tutorial_code')
+
 from logistic_sgd import LogisticRegression, load_data
 
 
