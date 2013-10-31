@@ -15,7 +15,7 @@ sys.path.append('tutorial_code')
 from logistic_sgd import LogisticRegression, load_data
 from showPklGz import showDataset, theanoTensor2NumpyArray
 from convolutional_mlp import LeNetConvPoolLayer
-
+from mlp import HiddenLayer
 
 class DredNetLayer(object):
     def __init__(self, rng, input, n_in, n_out, W=None, b=None):
@@ -79,7 +79,7 @@ class DredNetLayer(object):
         self.params = [self.W, self.b]
 
 
-def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz', nkerns=[20, 50], batch_size=5):
+def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist.pkl.gz', nkerns=[20, 50], batch_size=500):
     print('read ' + input)
     rng = numpy.random.RandomState(23455)
 
@@ -108,12 +108,18 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
     layer0 = LeNetConvPoolLayer(rng, input=layer0_input,
             image_shape=(batch_size, 1, 28, 28),
             filter_shape=(nkerns[0], 1, 5, 5), poolsize=(2, 2))
-    layer1_input = layer0.output.flatten(2)
-    n_layer1_unit = 500
-    layer1 = DredNetLayer(rng, input=layer1_input, n_in=nkerns[0] * 4 * 4, n_out=n_layer1_unit)
+    layer1 = LeNetConvPoolLayer(rng, input=layer0.output,
+            image_shape=(batch_size, nkerns[0], 12, 12),
+            filter_shape=(nkerns[1], nkerns[0], 5, 5), poolsize=(2, 2))
+
+    layer2_input = layer1.output.flatten(2)
+    n_layer2_unit = 500
+    #    layer1 = DredNetLayer(rng, input=layer1_input, n_in=nkerns[0] * 4 * 4, n_out=n_layer1_unit)
+    layer2 = HiddenLayer(rng, input=layer2_input, n_in=nkerns[1] * 4 * 4,
+                         n_out=n_layer2_unit, activation=T.tanh)
 
     # classify the values of the fully-connected sigmoidal layer
-    layer3 = LogisticRegression(input=layer1.output, n_in=n_layer1_unit, n_out=10)
+    layer3 = LogisticRegression(input=layer2.output, n_in=n_layer2_unit, n_out=10)
 
     # the cost we minimize during training is the NLL of the model
     cost = layer3.negative_log_likelihood(y)
@@ -181,8 +187,8 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
 
             iter = (epoch - 1) * n_train_batches + minibatch_index
 
-            #if iter % 100 == 0:
-            if iter % 10 == 0:
+            if iter % 100 == 0:
+            #if iter % 10 == 0:
                 print 'training @ iter = ', iter
             cost_ij = train_model(minibatch_index)
 
