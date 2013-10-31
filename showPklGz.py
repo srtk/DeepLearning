@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import cPickle
 import gzip
 import sys
@@ -6,7 +8,9 @@ from pprint import pprint
 import numpy
 import theano
 
-from logistic_sgd import LogisticRegression, load_data
+sys.path.append('tutorial_code')
+
+from logistic_sgd import load_data
 
 # can apply only to symbolic tensor (not shared variable)
 def theanoTensor2NumpyArray(tensor):

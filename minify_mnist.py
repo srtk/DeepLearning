@@ -25,13 +25,13 @@ def minifyDataset(input='data/mnist.pkl.gz', output='data/minified.pkl.gz'):
     valid_len = 100
     test_len = 100
 
-    minified_train_x = theanoTensor2NumpyArray(train_set_x[0:train_len-1:1])
-    minified_valid_x = theanoTensor2NumpyArray(valid_set_x[0:valid_len-1:1])
-    minified_test_x = theanoTensor2NumpyArray(test_set_x[0:test_len-1:1])
+    minified_train_x = theanoTensor2NumpyArray(train_set_x[0:train_len:1])
+    minified_valid_x = theanoTensor2NumpyArray(valid_set_x[0:valid_len:1])
+    minified_test_x = theanoTensor2NumpyArray(test_set_x[0:test_len:1])
     
-    minified_train_y = theanoTensor2NumpyArray(train_set_y[0:train_len-1:1])
-    minified_valid_y = theanoTensor2NumpyArray(train_set_y[0:valid_len-1:1])
-    minified_test_y = theanoTensor2NumpyArray(train_set_y[0:test_len-1:1])
+    minified_train_y = theanoTensor2NumpyArray(train_set_y[0:train_len:1])
+    minified_valid_y = theanoTensor2NumpyArray(train_set_y[0:valid_len:1])
+    minified_test_y = theanoTensor2NumpyArray(train_set_y[0:test_len:1])
 
     data = (minified_train_x, minified_train_y),(minified_valid_x, minified_valid_y), (minified_test_x, minified_test_y)
 
