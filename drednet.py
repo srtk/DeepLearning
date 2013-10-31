@@ -3,6 +3,7 @@
 import cPickle
 import gzip
 import sys
+import time
 from pprint import pprint
 
 import numpy
@@ -19,14 +20,6 @@ from convolutional_mlp import LeNetConvPoolLayer
 class DredNetLayer(object):
     def __init__(self, rng, input, n_in, n_out, W=None, b=None):
         """
-        Typical hidden layer of a MLP: units are fully-connected and have
-        sigmoidal activation function. Weight matrix W is of shape (n_in,n_out)
-        and the bias vector b is of shape (n_out,).
-
-        NOTE : The nonlinearity used here is tanh
-
-        Hidden unit activation is given by: tanh(dot(input,W) + b)
-
         :type rng: numpy.random.RandomState
         :param rng: a random number generator used to initialize weights
 
@@ -45,6 +38,7 @@ class DredNetLayer(object):
         """
         self.input = input
         activation=T.tanh
+        #todo: replace activation func with the rectifier
 
         # `W` is initialized with `W_values` which is uniformely sampled
         # from sqrt(-6./(n_in+n_hidden)) and sqrt(6./(n_in+n_hidden))
@@ -74,15 +68,18 @@ class DredNetLayer(object):
 
         self.W = W
         self.b = b
-
+        
         lin_output = T.dot(input, self.W) + self.b
+        # dropout_factor = numpy.asarray(rng.choice([0,1], size=(n_in, n_out)), dtype=theano.config.floatX)
+        # dropped_weight = T.dot(self.W, dropout_factor)
+        # lin_output = T.dot(input, dropped_weight) + self.b
         self.output = (lin_output if activation is None
                        else activation(lin_output))
         # parameters of the model
         self.params = [self.W, self.b]
 
 
-def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz', nkerns=[20, 50], batch_size=50):
+def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz', nkerns=[20, 50], batch_size=5):
     print('read ' + input)
     rng = numpy.random.RandomState(23455)
 
@@ -110,7 +107,7 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
     layer0_input = x.reshape((batch_size, 1, 28, 28))
     layer0 = LeNetConvPoolLayer(rng, input=layer0_input,
             image_shape=(batch_size, 1, 28, 28),
-                                filter_shape=(nkerns[0], 1, 5, 5), poolsize=(2, 2))
+            filter_shape=(nkerns[0], 1, 5, 5), poolsize=(2, 2))
     layer1_input = layer0.output.flatten(2)
     n_layer1_unit = 500
     layer1 = DredNetLayer(rng, input=layer1_input, n_in=nkerns[0] * 4 * 4, n_out=n_layer1_unit)
@@ -151,8 +148,6 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
           givens={
             x: train_set_x[index * batch_size: (index + 1) * batch_size],
             y: train_set_y[index * batch_size: (index + 1) * batch_size]})
-
-    return
     
     ###############
     # TRAIN MODEL #
