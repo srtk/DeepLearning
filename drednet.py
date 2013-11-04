@@ -79,8 +79,6 @@ class DredNetLayer(object):
 
         #lin_output = T.dot(input, self.W) + self.b
 
-        #tmpfunc = theano.function([input], lin_output)
-
         self.output = (lin_output if activation is None
                        else activation(lin_output))
         # parameters of the model
