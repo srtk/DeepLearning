@@ -61,16 +61,26 @@ class DredNetLayer(object):
 
         self.W = W
         self.b = b
-        
-        #lin_output = T.dot(input, self.W) + self.b
+
+        W_printed = theano.printing.Print('W_printed')(W)
 
         dropout_factor_values = numpy.asarray(rng.choice([0,1], size=(n_in, n_out)), dtype=theano.config.floatX)
-        dropout_factor = theano.shared(value=dropout_factor_values, name="drop", borrow=True)
+        dropout_factor = theano.shared(value=dropout_factor_values, name="dropout_factor")
+        dropout_factor_printed = theano.printing.Print('dropout_factor')(dropout_factor)
         dropped_weight, updates = theano.map(
-            fn=lambda unit, dropout: dropout * unit,
-            sequences=[W, dropout_factor])
+            fn=lambda unit, dropout: unit * dropout,
+            #sequences=[W, dropout_factor],
+            sequences=[W_printed, dropout_factor_printed],
+            name="dropped_weight")
+        dropped_weight_printed = theano.printing.Print('dropped_weight')(dropped_weight)
 
-        lin_output = T.dot(input, dropped_weight) + self.b
+        #lin_output = T.dot(input, dropped_weight) + self.b
+        lin_output = T.dot(input, dropped_weight_printed) + self.b
+
+        #lin_output = T.dot(input, self.W) + self.b
+
+        #tmpfunc = theano.function([input], lin_output)
+
         self.output = (lin_output if activation is None
                        else activation(lin_output))
         # parameters of the model
