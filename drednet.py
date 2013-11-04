@@ -14,9 +14,13 @@ import theano.tensor as T
 sys.path.append('tutorial_code')
 
 from logistic_sgd import LogisticRegression, load_data
-from showPklGz import showDataset, theanoTensor2NumpyArray
+from showPklGz import showDataset, theanoTensor2NumpyArray as tt2na
 from convolutional_mlp import LeNetConvPoolLayer
 from mlp import HiddenLayer
+from pprint import pprint as pp
+from theano.printing import pprint as tpp
+from theano.printing import debugprint as tdp
+
 
 class DredNetLayer(object):
     def __init__(self, rng, input, n_in, n_out, W=None, b=None):
@@ -58,10 +62,15 @@ class DredNetLayer(object):
         self.W = W
         self.b = b
         
-        lin_output = T.dot(input, self.W) + self.b
-        # dropout_factor = numpy.asarray(rng.choice([0,1], size=(n_in, n_out)), dtype=theano.config.floatX)
-        # dropped_weight = T.dot(self.W, dropout_factor)
-        # lin_output = T.dot(input, dropped_weight) + self.b
+        #lin_output = T.dot(input, self.W) + self.b
+
+        dropout_factor_values = numpy.asarray(rng.choice([0,1], size=(n_in, n_out)), dtype=theano.config.floatX)
+        dropout_factor = theano.shared(value=dropout_factor_values, name="drop", borrow=True)
+        dropped_weight, updates = theano.map(
+            fn=lambda unit, dropout: dropout * unit,
+            sequences=[W, dropout_factor])
+
+        lin_output = T.dot(input, dropped_weight) + self.b
         self.output = (lin_output if activation is None
                        else activation(lin_output))
         # parameters of the model
@@ -90,7 +99,7 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
     x = T.matrix('x')   # the data is presented as rasterized images
     y = T.ivector('y')  # the labels are presented as 1D vector of
                         # [int] labels
-    
+
     ishape = (28, 28)  # this is the size of MNIST images
 
     layer0_input = x.reshape((batch_size, 1, 28, 28))
@@ -103,9 +112,9 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
 
     layer2_input = layer1.output.flatten(2)
     n_layer2_unit = 500
-    #    layer1 = DredNetLayer(rng, input=layer1_input, n_in=nkerns[0] * 4 * 4, n_out=n_layer1_unit)
-    layer2 = HiddenLayer(rng, input=layer2_input, n_in=nkerns[1] * 4 * 4,
-                         n_out=n_layer2_unit, activation=T.tanh)
+    layer2 = DredNetLayer(rng, input=layer2_input, n_in=nkerns[1] * 4 * 4, n_out=n_layer2_unit)
+    #layer2 = HiddenLayer(rng, input=layer2_input, n_in=nkerns[1] * 4 * 4,
+#                         n_out=n_layer2_unit, activation=T.tanh)
 
     # classify the values of the fully-connected sigmoidal layer
     layer3 = LogisticRegression(input=layer2.output, n_in=n_layer2_unit, n_out=10)
@@ -114,7 +123,7 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
     cost = layer3.negative_log_likelihood(y)
     # create a function to compute the mistakes that are made by the model
     test_model = theano.function([index], layer3.errors(y),
-             givens={
+            givens={
                 x: test_set_x[index * batch_size: (index + 1) * batch_size],
                 y: test_set_y[index * batch_size: (index + 1) * batch_size]})
 
