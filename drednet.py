@@ -64,13 +64,20 @@ class DredNetLayer(object):
 
         W_printed = theano.printing.Print('W_printed')(W)
 
-        dropout_factor_values = numpy.asarray(rng.choice([0,1], size=(n_in, n_out)), dtype=theano.config.floatX)
-        dropout_factor = theano.shared(value=dropout_factor_values, name="dropout_factor")
-        dropout_factor_printed = theano.printing.Print('dropout_factor')(dropout_factor)
+        #dropout_factor_values = numpy.asarray(rng.choice([0,1], size=(n_in, n_out)), dtype=theano.config.floatX)
+        #dropout_factor = theano.shared(value=dropout_factor_values, name="dropout_factor")
+        #dropout_factor_printed = theano.printing.Print('dropout_factor')(dropout_factor)
+
+        
+        def dropout(unit):
+            #random_dropout_factor = numpy.asarray(rng.choice([0,1], size=(n_in, n_out)), dtype=theano.config.floatX)
+            #return unit * random_dropout_factor
+            pp(unit)
+            return unit
+
         dropped_weight, updates = theano.map(
-            fn=lambda unit, dropout: unit * dropout,
-            #sequences=[W, dropout_factor],
-            sequences=[W_printed, dropout_factor_printed],
+            fn=dropout,
+            sequences=[W_printed],
             name="dropped_weight")
         dropped_weight_printed = theano.printing.Print('dropped_weight')(dropped_weight)
 
