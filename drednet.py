@@ -69,7 +69,8 @@ class DredNetLayer(object):
         rand = self.theano_rng.binomial(n=1, p=drop_probability, size=input.shape, dtype=theano.config.floatX)
         dropped_input = rand * input
         lin_output = T.dot(dropped_input, self.W) + self.b
-        self.output = T.tanh(lin_output)
+        rectified = T.switch(lin_output>0, lin_output, 0)
+        self.output = rectified
 
         # parameters of the model
         self.params = [self.W, self.b]

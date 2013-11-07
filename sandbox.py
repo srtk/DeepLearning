@@ -39,9 +39,9 @@ if __name__ == '__main__':
     c = rx.sum()
     dy = T.grad(c, x)
     pdy = theano.printing.Print()(dy)
-    m = T.max(pdy)
+    m = T.switch(pdy>0, pdy, 0)
     f2 = theano.function([x], m)
-    input = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]]
+    input = [[-1,-2,3],[-4,-5,6],[7,-8,-9],[10,-11,-12]]
     out2 = f2(input)
     pp(out2)
     print('end')
