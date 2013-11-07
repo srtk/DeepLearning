@@ -64,19 +64,10 @@ class DredNetLayer(object):
 
         W_printed = theano.printing.Print('W_printed')(W)
 
-        #dropout_factor_values = numpy.asarray(rng.choice([0,1], size=(n_in, n_out)), dtype=theano.config.floatX)
-        #dropout_factor = theano.shared(value=dropout_factor_values, name="dropout_factor")
-        #dropout_factor_printed = theano.printing.Print('dropout_factor')(dropout_factor)
-
-        
-        def dropout(unit):
-            #random_dropout_factor = numpy.asarray(rng.choice([0,1], size=(n_in, n_out)), dtype=theano.config.floatX)
-            #return unit * random_dropout_factor
-            pp(unit)
-            return unit
+        self.theano_rng = theano.tensor.shared_randomstreams.RandomStreams(seed=234)
 
         dropped_weight, updates = theano.map(
-            fn=dropout,
+            fn=lambda unit: unit * self.theano_rng.binomial(n=1, p=0.5, dtype=theano.config.floatX),
             sequences=[W_printed],
             name="dropped_weight")
         dropped_weight_printed = theano.printing.Print('dropped_weight')(dropped_weight)
@@ -148,8 +139,7 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
                 y: valid_set_y[index * batch_size: (index + 1) * batch_size]})
 
     # create a list of all model parameters to be fit by gradient descent
-    #params = layer3.params + layer2.params + layer1.params + layer0.params
-    params = layer3.params + layer1.params + layer0.params
+    params = layer3.params + layer2.params + layer1.params + layer0.params
 
     # create a list of gradients for all model parameters
     grads = T.grad(cost, params)
@@ -163,7 +153,7 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
     for param_i, grad_i in zip(params, grads):
         updates.append((param_i, param_i - learning_rate * grad_i))
 
-    train_model = theano.function([index], cost, updates=updates,
+    train_model = theano.function([index], cost, updates=updates, mode='DebugMode',
           givens={
             x: train_set_x[index * batch_size: (index + 1) * batch_size],
             y: train_set_y[index * batch_size: (index + 1) * batch_size]})
