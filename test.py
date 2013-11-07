@@ -16,13 +16,7 @@ from theano.printing import debugprint as tdp
 sys.path.append('tutorial_code')
 
 from showPklGz import showDataset, theanoTensor2NumpyArray as tt2na
-
-def printValue(inputs, output, input_value):
-    out_name = output.name if output.name else 'printValue'
-    p= theano.printing.Print(out_name)(output)
-    pf = theano.function(inputs, output)
-    result = pf(input_value)
-    pp(result)
+from my_theano_util import printValue
 
 if __name__ == '__main__':
     #theano.config.compute_test_value = 'warn'

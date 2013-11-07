@@ -64,9 +64,6 @@ class DredNetLayer(object):
 
         self.W = W
         self.b = b
-
-        #input_printed = theano.printing.Print('input_printed')(self.input)
-
         self.theano_rng = theano.tensor.shared_randomstreams.RandomStreams(seed=234)
 
         #def dropout(unit):
@@ -74,15 +71,17 @@ class DredNetLayer(object):
         #    tmp = unit * rand
         #    return tmp
 
-        rand = self.theano_rng.binomial(n=1, p=drop_probability, dtype=theano.config.floatX)
+        rand = self.theano_rng.binomial(n=1, p=drop_probability, size=input.shape, dtype=theano.config.floatX)
         dropped_input = rand * input
+        pi = theano.printing.Print('pi')(dropped_input)
         #dropped_input = input
         #dropped_input, updates = theano.map(
         #    fn=dropout,
         #    sequences=[self.input],
         #    name="dropped_input")
 
-        lin_output = T.dot(dropped_input, self.W) + self.b
+        #lin_output = T.dot(dropped_input, self.W) + self.b
+        lin_output = T.dot(pi, self.W) + self.b
         #lin_output = T.dot(input, self.W) + self.b
 
         self.output = (lin_output if activation is None
