@@ -15,8 +15,7 @@ from theano.printing import debugprint as tdp
 
 sys.path.append('tutorial_code')
 
-from showPklGz import showDataset, theanoTensor2NumpyArray as tt2na
-from my_theano_util import printValue
+from my_theano_util import theanoTensor2NumpyArray as tt2na
 
 if __name__ == '__main__':
     #theano.config.compute_test_value = 'warn'
@@ -39,8 +38,9 @@ if __name__ == '__main__':
     rx = rand * (x ** 2) * 0.5
     c = rx.sum()
     dy = T.grad(c, x)
-    #dy = y
-    f2 = theano.function([x], dy)
+    pdy = theano.printing.Print()(dy)
+    m = T.max(pdy)
+    f2 = theano.function([x], m)
     input = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]]
     out2 = f2(input)
     pp(out2)

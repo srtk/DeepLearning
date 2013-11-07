@@ -47,6 +47,7 @@ class DredNetLayer(object):
         activation=T.tanh
         #todo: replace activation func with the rectifier
 
+
         drop_probability = 0.5
 
         if W is None:
@@ -54,8 +55,6 @@ class DredNetLayer(object):
                     low=-numpy.sqrt(6. / (n_in + n_out)),
                     high=numpy.sqrt(6. / (n_in + n_out)),
                     size=(n_in, n_out)), dtype=theano.config.floatX)
-            if activation == theano.tensor.nnet.sigmoid:
-                W_values *= 4
 
             W = theano.shared(value=W_values, name='W', borrow=True)
 
@@ -70,8 +69,7 @@ class DredNetLayer(object):
         rand = self.theano_rng.binomial(n=1, p=drop_probability, size=input.shape, dtype=theano.config.floatX)
         dropped_input = rand * input
         lin_output = T.dot(dropped_input, self.W) + self.b
-        self.output = (lin_output if activation is None
-                       else activation(lin_output))
+        self.output = T.tanh(lin_output)
 
         # parameters of the model
         self.params = [self.W, self.b]
