@@ -15,10 +15,12 @@ from theano.printing import debugprint as tdp
 
 sys.path.append('tutorial_code')
 
-from showPklGz import showDataset, theanoTensor2NumpyArray as tt2na
+# can apply only to symbolic tensor (not shared variable)
+def theanoTensor2NumpyArray(tensor):
+    constFunc = theano.function([], tensor)
+    return constFunc()
 
-
-#theano.function(inputs, output)(input_value)でOK
+#theano.function(inputs, output)(input_value)
 
 #def printValue(inputs, output, input_value):
 #    #out_name = output.name if output.name else 'printValue'

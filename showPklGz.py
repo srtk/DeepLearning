@@ -11,11 +11,7 @@ import theano
 sys.path.append('tutorial_code')
 
 from logistic_sgd import load_data
-
-# can apply only to symbolic tensor (not shared variable)
-def theanoTensor2NumpyArray(tensor):
-    constFunc = theano.function([], tensor)
-    return constFunc()
+from my_theano_util import theanoTensor2NumpyArray
 
 def showDataset(dataset='data/mnist.pkl.gz'):
     """

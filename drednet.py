@@ -14,13 +14,14 @@ import theano.tensor as T
 sys.path.append('tutorial_code')
 
 from logistic_sgd import LogisticRegression, load_data
-from showPklGz import showDataset, theanoTensor2NumpyArray as tt2na
 from convolutional_mlp import LeNetConvPoolLayer
 from mlp import HiddenLayer
 from pprint import pprint as pp
 from theano.printing import pprint as tpp
 from theano.printing import debugprint as tdp
 from theano.compile import debugmode
+
+from my_theano_util import theanoTensor2NumpyArray as tt2na
 
 
 class DredNetLayer(object):
@@ -66,24 +67,9 @@ class DredNetLayer(object):
         self.b = b
         self.theano_rng = theano.tensor.shared_randomstreams.RandomStreams(seed=234)
 
-        #def dropout(unit):
-        #    rand = self.theano_rng.binomial(n=1, p=drop_probability, dtype=theano.config.floatX)
-        #    tmp = unit * rand
-        #    return tmp
-
         rand = self.theano_rng.binomial(n=1, p=drop_probability, size=input.shape, dtype=theano.config.floatX)
         dropped_input = rand * input
-        pi = theano.printing.Print('pi')(dropped_input)
-        #dropped_input = input
-        #dropped_input, updates = theano.map(
-        #    fn=dropout,
-        #    sequences=[self.input],
-        #    name="dropped_input")
-
-        #lin_output = T.dot(dropped_input, self.W) + self.b
-        lin_output = T.dot(pi, self.W) + self.b
-        #lin_output = T.dot(input, self.W) + self.b
-
+        lin_output = T.dot(dropped_input, self.W) + self.b
         self.output = (lin_output if activation is None
                        else activation(lin_output))
 
