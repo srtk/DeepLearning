@@ -69,23 +69,18 @@ class DredNetLayer(object):
 
         self.theano_rng = theano.tensor.shared_randomstreams.RandomStreams(seed=234)
 
-        def dropout(unit):
-            #unit_print = theano.printing.Print('unit_print')(unit)
-            tmp = self.theano_rng.binomial(n=1, p=drop_probability, dtype=theano.config.floatX)
-            tmp2 = unit * tmp
-            tmp2.name='tmp2'
-            #tmp2_print = theano.printing.Print('tmp2')(tmp2)
+        #def dropout(unit):
+        #    rand = self.theano_rng.binomial(n=1, p=drop_probability, dtype=theano.config.floatX)
+        #    tmp = unit * rand
+        #    return tmp
 
-            #fgraph = theano.FunctionGraph([unit], [tmp2])
-            #sov = shape_of_variables(fgraph, {unit: (800, 1)})
-            return tmp2
-
+        rand = self.theano_rng.binomial(n=1, p=drop_probability, dtype=theano.config.floatX)
+        dropped_input = rand * input
         #dropped_input = input
-        dropped_input, updates = theano.map(
-            #fn=lambda unit: unit * self.theano_rng.binomial(n=1, p=drop_probability, dtype=theano.config.floatX),
-            fn=dropout,
-            sequences=[self.input],
-            name="dropped_input")
+        #dropped_input, updates = theano.map(
+        #    fn=dropout,
+        #    sequences=[self.input],
+        #    name="dropped_input")
 
         lin_output = T.dot(dropped_input, self.W) + self.b
         #lin_output = T.dot(input, self.W) + self.b
@@ -151,8 +146,7 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
                 y: valid_set_y[index * batch_size: (index + 1) * batch_size]})
 
     # create a list of all model parameters to be fit by gradient descent
-    #params = layer3.params + layer2.params + layer1.params + layer0.params
-    params = layer3.params + layer2.params
+    params = layer3.params + layer2.params + layer1.params + layer0.params
 
     # create a list of gradients for all model parameters
     grads = T.grad(cost, params)
