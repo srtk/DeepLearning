@@ -17,7 +17,7 @@ def theanoTensor2NumpyArray(tensor):
     constFunc = theano.function([], tensor)
     return constFunc()
 
-def showDataset(dataset='mnist.pkl.gz'):
+def showDataset(dataset='data/mnist.pkl.gz'):
     """
     :type dataset: string
     :param dataset: path the the pickled dataset
@@ -45,7 +45,7 @@ def showDataset(dataset='mnist.pkl.gz'):
 
 
 if __name__ == '__main__':
-    input="mnist.pkl.gz"
+    input="data/mnist.pkl.gz"
     if(len(sys.argv) >= 2):
         input=sys.argv[1]
     showDataset(input)

@@ -20,6 +20,7 @@ from mlp import HiddenLayer
 from pprint import pprint as pp
 from theano.printing import pprint as tpp
 from theano.printing import debugprint as tdp
+from theano.compile import debugmode
 
 
 class DredNetLayer(object):
@@ -45,6 +46,8 @@ class DredNetLayer(object):
         activation=T.tanh
         #todo: replace activation func with the rectifier
 
+        drop_probability = 0.5
+
         if W is None:
             W_values = numpy.asarray(rng.uniform(
                     low=-numpy.sqrt(6. / (n_in + n_out)),
@@ -62,26 +65,36 @@ class DredNetLayer(object):
         self.W = W
         self.b = b
 
-        W_printed = theano.printing.Print('W_printed')(W)
+        #input_printed = theano.printing.Print('input_printed')(self.input)
 
         self.theano_rng = theano.tensor.shared_randomstreams.RandomStreams(seed=234)
 
-        dropped_weight, updates = theano.map(
-            fn=lambda unit: unit * self.theano_rng.binomial(n=1, p=0.5, dtype=theano.config.floatX),
-            sequences=[W_printed],
-            name="dropped_weight")
-        dropped_weight_printed = theano.printing.Print('dropped_weight')(dropped_weight)
+        def dropout(unit):
+            #unit_print = theano.printing.Print('unit_print')(unit)
+            tmp = self.theano_rng.binomial(n=1, p=drop_probability, dtype=theano.config.floatX)
+            tmp2 = unit * tmp
+            tmp2.name='tmp2'
+            #tmp2_print = theano.printing.Print('tmp2')(tmp2)
 
-        #lin_output = T.dot(input, dropped_weight) + self.b
-        lin_output = T.dot(input, dropped_weight_printed) + self.b
+            #fgraph = theano.FunctionGraph([unit], [tmp2])
+            #sov = shape_of_variables(fgraph, {unit: (800, 1)})
+            return tmp2
 
+        #dropped_input = input
+        dropped_input, updates = theano.map(
+            #fn=lambda unit: unit * self.theano_rng.binomial(n=1, p=drop_probability, dtype=theano.config.floatX),
+            fn=dropout,
+            sequences=[self.input],
+            name="dropped_input")
+
+        lin_output = T.dot(dropped_input, self.W) + self.b
         #lin_output = T.dot(input, self.W) + self.b
 
         self.output = (lin_output if activation is None
                        else activation(lin_output))
+
         # parameters of the model
         self.params = [self.W, self.b]
-
 
 def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz', nkerns=[20, 50], batch_size=5):
     print('read ' + input)
@@ -119,8 +132,7 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
     layer2_input = layer1.output.flatten(2)
     n_layer2_unit = 500
     layer2 = DredNetLayer(rng, input=layer2_input, n_in=nkerns[1] * 4 * 4, n_out=n_layer2_unit)
-    #layer2 = HiddenLayer(rng, input=layer2_input, n_in=nkerns[1] * 4 * 4,
-#                         n_out=n_layer2_unit, activation=T.tanh)
+    #layer2 = HiddenLayer(rng, input=layer2_input, n_in=nkerns[1] * 4 * 4, n_out=n_layer2_unit, activation=T.tanh)
 
     # classify the values of the fully-connected sigmoidal layer
     layer3 = LogisticRegression(input=layer2.output, n_in=n_layer2_unit, n_out=10)
@@ -139,7 +151,8 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
                 y: valid_set_y[index * batch_size: (index + 1) * batch_size]})
 
     # create a list of all model parameters to be fit by gradient descent
-    params = layer3.params + layer2.params + layer1.params + layer0.params
+    #params = layer3.params + layer2.params + layer1.params + layer0.params
+    params = layer3.params + layer2.params
 
     # create a list of gradients for all model parameters
     grads = T.grad(cost, params)
@@ -153,7 +166,8 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
     for param_i, grad_i in zip(params, grads):
         updates.append((param_i, param_i - learning_rate * grad_i))
 
-    train_model = theano.function([index], cost, updates=updates, mode='DebugMode',
+    train_model = theano.function([index], cost, updates=updates,
+          #mode=debugmode.DebugMode(check_c_code=False),
           givens={
             x: train_set_x[index * batch_size: (index + 1) * batch_size],
             y: train_set_y[index * batch_size: (index + 1) * batch_size]})
