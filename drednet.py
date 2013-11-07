@@ -75,7 +75,7 @@ class DredNetLayer(object):
         # parameters of the model
         self.params = [self.W, self.b]
 
-def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz', nkerns=[20, 50], batch_size=5):
+def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist.pkl.gz', nkerns=[20, 50], batch_size=500):
     print('read ' + input)
     rng = numpy.random.RandomState(23455)
 
@@ -155,8 +155,7 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
     ###############
     print '... training'
     # early-stopping parameters
-    #patience = 10000  # look as this many examples regardless
-    patience = 100  # look as this many examples regardless
+    patience = 10000  # look as this many examples regardless
     patience_increase = 2  # wait this much longer when a new best is
                            # found
     improvement_threshold = 0.995  # a relative improvement of this much is
@@ -182,7 +181,7 @@ def test_drednet(learning_rate=0.1, n_epochs=200, input='data/mnist_100.pkl.gz',
 
             iter = (epoch - 1) * n_train_batches + minibatch_index
 
-            if iter % 10 == 0:
+            if iter % 100 == 0:
                 print 'training @ iter = ', iter
             cost_ij = train_model(minibatch_index)
 
