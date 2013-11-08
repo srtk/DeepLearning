@@ -3,6 +3,7 @@
 import cPickle
 import gzip
 import sys
+import os.path
 from pprint import pprint
 
 import numpy
@@ -13,8 +14,19 @@ sys.path.append('tutorial_code')
 from logistic_sgd import load_data
 from showPklGz import showDataset, theanoTensor2NumpyArray
 
-def convert_cifar10(input='data/cifar-10-python.tar.gz', output='data/cifar10_dlt_compatible.pkl.gz'):
-    print('read ' + input)
+def unpickle(file):
+    import cPickle
+    fo = open(file, 'rb')
+    dict = cPickle.load(fo)
+    fo.close()
+    return dict
+
+def convert_cifar10(output='data/cifar10_dlt_compatible.pkl.gz'):
+    input_dir = 'data/cifar-10-batches-py'
+    datafiles = ['data_batch_1','data_batch_2','data_batch_3','data_batch_4','data_batch_5']
+    for datafile in datafiles:
+        input_path = os.path.join(input_dir, datafile)
+        print('read ' + input_path)
     #datasets = load_data(input)
     #
     #train_set_x, train_set_y = datasets[0]
@@ -39,7 +51,7 @@ def convert_cifar10(input='data/cifar-10-python.tar.gz', output='data/cifar10_dl
     #cPickle.dump(data, f, -1)
     #f.close()
     #
-    #print('output to ' + output)
+    print('output to ' + output)
 
 
 if __name__ == '__main__':
