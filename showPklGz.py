@@ -24,11 +24,13 @@ def showDataset(dataset='data/mnist.pkl.gz'):
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
     test_set_x, test_set_y = datasets[2]
-    
+
+    #type(train_set_x) => <class 'theano.tensor.sharedvar.TensorSharedVariable'>
     np_train_x = train_set_x.get_value(borrow=True)
     np_valid_x = valid_set_x.get_value(borrow=True)
     np_test_x = test_set_x.get_value(borrow=True)
-    
+
+    #type(train_set_y) => <class 'theano.tensor.basic.TensorVariable'>
     np_train_y = theanoTensor2NumpyArray(train_set_y)
     np_valid_y = theanoTensor2NumpyArray(valid_set_y)
     np_test_y = theanoTensor2NumpyArray(test_set_y)

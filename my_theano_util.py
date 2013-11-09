@@ -13,8 +13,6 @@ import theano.tensor as T
 from theano.printing import pprint as tpp
 from theano.printing import debugprint as tdp
 
-sys.path.append('tutorial_code')
-
 # can apply only to symbolic tensor (not shared variable)
 def theanoTensor2NumpyArray(tensor):
     constFunc = theano.function([], tensor)
