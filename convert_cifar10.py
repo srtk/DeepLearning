@@ -23,7 +23,7 @@ def unpickle(file):
     return dict
 
 #convert to the format loadable with logistic_sgd.load_data
-def convert_cifar10(output='data/cifar10_dlt_compatible.pkl.gz'):
+def convert_cifar10(output='data/cifar10_for_dlt.pkl.gz'):
     input_dir = 'data/cifar-10-batches-py'
     if os.path.exists(output):
         print(output + ' already exists. remove it manually for safety')
@@ -47,6 +47,8 @@ def convert_cifar10(output='data/cifar10_dlt_compatible.pkl.gz'):
 
     test_dir = dir_from_file('test_batch')
 
+    print('reformating datas...')
+
     #description in logistic_sgd.py
 
     #train_set, valid_set, test_set format: tuple(input, target)
@@ -57,17 +59,24 @@ def convert_cifar10(output='data/cifar10_dlt_compatible.pkl.gz'):
     #target to the example with the same index in the input.
     n_data = 50000
     n_train_set = 41666 #same proportion as mnist 50000 / (50000+10000)
-    n_valid_set = n_data - n_train_set
 
     #MNIST pixel datas vary from 0 to (255.0/256.0), CIFAR-10 from 0 to 255
-    train_set = (numpy.asarray(datas[:n_train_set]) / 256.,
-                 numpy.asarray(labels[:n_train_set]))
-    valid_set = (numpy.asarray(datas[:n_valid_set]) / 256.,
-                 numpy.asarray(labels[:n_valid_set]))
-    test_set = (numpy.asarray(test_dir['data']) / 256.,
-                numpy.asarray(test_dir['labels']))
+
+
+    train_x = numpy.divide(numpy.asarray(datas[:n_train_set]), 256.)
+    valid_x = numpy.divide(numpy.asarray(datas[n_train_set:]), 256.)
+    test_x = numpy.divide(numpy.asarray(test_dir['data']), 256.)
+
+    train_y = numpy.asarray(labels[:n_train_set])
+    valid_y = numpy.asarray(labels[n_train_set:])
+    test_y = numpy.asarray(numpy.asarray(test_dir['labels']))
+
+    train_set = (train_x, train_y)
+    valid_set = (valid_x, valid_y)
+    test_set = (test_x, test_y)
     to_pickle = (train_set, valid_set, test_set)
 
+    print('start pickling...')
     f = gzip.open(output, 'wb')
     cPickle.dump(to_pickle, f, protocol=cPickle.HIGHEST_PROTOCOL)
     f.close()
