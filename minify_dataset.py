@@ -5,6 +5,7 @@ import gzip
 import os
 import sys
 import math
+from optparse import OptionParser
 from pprint import pprint as pp
 
 import numpy
@@ -40,19 +41,17 @@ def minifyDataset(input, output, minify_rate=0.01):
     orig_valid_len = len(valid_set_x.get_value(borrow=True))
     orig_test_len = len(test_set_x.get_value(borrow=True))
 
-    train_len = int(math.floor(orig_train_len * minify_rate))
-    valid_len = int(math.floor(orig_valid_len * minify_rate))
-    test_len = int(math.floor(orig_test_len * minify_rate))
+    mini_train_len = int(math.floor(orig_train_len * minify_rate))
+    mini_valid_len = int(math.floor(orig_valid_len * minify_rate))
+    mini_test_len = int(math.floor(orig_test_len * minify_rate))
 
-    return True
-
-    minified_train_x = theanoTensor2NumpyArray(train_set_x[0:train_len:1])
-    minified_valid_x = theanoTensor2NumpyArray(valid_set_x[0:valid_len:1])
-    minified_test_x = theanoTensor2NumpyArray(test_set_x[0:test_len:1])
+    minified_train_x = theanoTensor2NumpyArray(train_set_x[0:mini_train_len:1])
+    minified_valid_x = theanoTensor2NumpyArray(valid_set_x[0:mini_valid_len:1])
+    minified_test_x = theanoTensor2NumpyArray(test_set_x[0:mini_test_len:1])
     
-    minified_train_y = theanoTensor2NumpyArray(train_set_y[0:train_len:1])
-    minified_valid_y = theanoTensor2NumpyArray(train_set_y[0:valid_len:1])
-    minified_test_y = theanoTensor2NumpyArray(train_set_y[0:test_len:1])
+    minified_train_y = theanoTensor2NumpyArray(train_set_y[0:mini_train_len:1])
+    minified_valid_y = theanoTensor2NumpyArray(train_set_y[0:mini_valid_len:1])
+    minified_test_y = theanoTensor2NumpyArray(train_set_y[0:mini_test_len:1])
 
     data = (minified_train_x, minified_train_y),(minified_valid_x, minified_valid_y), (minified_test_x, minified_test_y)
 
@@ -65,7 +64,10 @@ def minifyDataset(input, output, minify_rate=0.01):
 
 
 if __name__ == '__main__':
-    input = 'data/cifar10_dlt_compatible.pkl.gz'
-    output = 'data/cifar10_dlt_compatible_100.pkl.gz'
+    parser = OptionParser()
+    (options, args) = parser.parse_args()
+
+    input = args[0] if args[0] else 'data/cifar10_dlt_compatible.pkl.gz'
+    output = args[1] if args[1] else 'data/cifar10_dlt_compatible_100.pkl.gz'
     minifyDataset(input=input, output=output)
 
