@@ -12,6 +12,7 @@ sys.path.append('tutorial_code')
 
 from logistic_sgd import load_data
 from my_theano_util import theanoTensor2NumpyArray
+from my_python_util import getVarNames
 
 def showDataset(dataset='data/mnist.pkl.gz'):
     """
@@ -35,11 +36,23 @@ def showDataset(dataset='data/mnist.pkl.gz'):
     np_valid_y = theanoTensor2NumpyArray(valid_set_y)
     np_test_y = theanoTensor2NumpyArray(test_set_y)
 
-    for varName in "np_train_x[0] np_train_y np_valid_x[0] np_valid_y np_test_x[0] np_test_y".split(" "):
+    varNames = "np_train_x[0] np_train_y np_valid_x[0] np_valid_y np_test_x[0] np_test_y".split(" ")
+    for varName in varNames:
         var = eval(varName)
         print(varName)
         print("len:" + str(len(var)))
         pprint(var)
+
+    for varName in varNames: #print again for convenience
+        var = eval(varName)
+        print(varName + " len:" + str(len(var)))
+
+    pairs = [(np_train_x, np_train_y), (np_valid_x, np_valid_y), (np_test_x, np_test_y)]
+    for pair in pairs:
+        if not (len(pair[0]) == len(pair[1])):
+            name_x = getVarNames(pair[0], locals())
+            name_y = getVarNames(pair[1], locals())
+            print("WARNING: the lengths of %s & %s are different" % (name_x, name_y))
 
 
 if __name__ == '__main__':
