@@ -25,6 +25,9 @@ def unpickle(file):
 #convert to the format loadable with logistic_sgd.load_data
 def convert_cifar10(output='data/cifar10_dlt_compatible.pkl.gz'):
     input_dir = 'data/cifar-10-batches-py'
+    if os.path.exists(output):
+        print(output + ' already exists. remove it manually for safety')
+        return
 
     def dir_from_file(file):
         input_path = os.path.join(input_dir, file)
@@ -55,15 +58,16 @@ def convert_cifar10(output='data/cifar10_dlt_compatible.pkl.gz'):
     n_data = 50000
     n_train_set = 41666 #same proportion as mnist 50000 / (50000+10000)
     n_valid_set = n_data - n_train_set
-    train_set = (numpy.asarray(datas[:n_train_set]),
+
+    #MNIST pixel datas vary from 0 to (255.0/256.0), CIFAR-10 from 0 to 255
+    train_set = (numpy.asarray(datas[:n_train_set]) / 256.,
                  numpy.asarray(labels[:n_train_set]))
-    valid_set = (numpy.asarray(datas[:n_valid_set]),
+    valid_set = (numpy.asarray(datas[:n_valid_set]) / 256.,
                  numpy.asarray(labels[:n_valid_set]))
-    test_set = (numpy.asarray(test_dir['data']),
+    test_set = (numpy.asarray(test_dir['data']) / 256.,
                 numpy.asarray(test_dir['labels']))
     to_pickle = (train_set, valid_set, test_set)
 
-    return
     f = gzip.open(output, 'wb')
     cPickle.dump(to_pickle, f, protocol=cPickle.HIGHEST_PROTOCOL)
     f.close()

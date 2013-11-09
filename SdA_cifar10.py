@@ -41,7 +41,7 @@ import theano
 import theano.tensor as T
 from theano.tensor.shared_randomstreams import RandomStreams
 
-sys.path.append('../tutorial_code')
+sys.path.append('tutorial_code')
 
 from logistic_sgd import LogisticRegression, load_data
 from mlp import HiddenLayer
@@ -294,7 +294,8 @@ class SdA(object):
 
 def test_SdA(finetune_lr=0.1, pretraining_epochs=15,
              pretrain_lr=0.001, training_epochs=1000,
-             dataset='../data/mnist.pkl.gz', batch_size=1):
+             dataset='../data/mnist.pkl.gz', batch_size=1,
+             n_ins=28*28, n_outs=10):
     """
     Demonstrates how to train and test a stochastic denoising autoencoder.
 
@@ -332,9 +333,9 @@ def test_SdA(finetune_lr=0.1, pretraining_epochs=15,
     numpy_rng = numpy.random.RandomState(89677)
     print '... building the model'
     # construct the stacked denoising autoencoder class
-    sda = SdA(numpy_rng=numpy_rng, n_ins=28 * 28,
+    sda = SdA(numpy_rng=numpy_rng, n_ins=n_ins,
               hidden_layers_sizes=[1000, 1000, 1000],
-              n_outs=10)
+              n_outs=n_outs)
 
     #########################
     # PRETRAINING THE MODEL #
@@ -443,4 +444,6 @@ def test_SdA(finetune_lr=0.1, pretraining_epochs=15,
 
 
 if __name__ == '__main__':
-    test_SdA(dataset='../data/cifar10_for_dlt_100.pkl.gz')
+    test_SdA(dataset='data/cifar10_for_dlt_100.pkl.gz',
+             n_ins=3072,
+             n_outs=10)
