@@ -443,4 +443,4 @@ def test_SdA(finetune_lr=0.1, pretraining_epochs=15,
 
 
 if __name__ == '__main__':
-    test_SdA()
+    test_SdA(dataset='../data/cifar10_for_dlt_100.pkl.gz')
