@@ -36,6 +36,11 @@ def showDataset(dataset='data/mnist.pkl.gz'):
     np_valid_y = theanoTensor2NumpyArray(valid_set_y)
     np_test_y = theanoTensor2NumpyArray(test_set_y)
 
+
+    np_train_x0 = np_train_x[0]
+    np_valid_x0 = np_valid_x[0]
+    np_test_x0 = np_test_x[0]
+
     varNames = "np_train_x[0] np_train_y np_valid_x[0] np_valid_y np_test_x[0] np_test_y".split(" ")
     for varName in varNames:
         var = eval(varName)
@@ -47,12 +52,22 @@ def showDataset(dataset='data/mnist.pkl.gz'):
         var = eval(varName)
         print(varName + " len:" + str(len(var)))
 
+    vars = [np_train_x0, np_train_y, np_valid_x0, np_valid_y, np_test_x0, np_test_y]
+    var_names = locals()
+    for var in vars:
+        name = getVarNames(var, var_names)
+        print(str(name) + ' start')
+        pprint(var)
+        print("len:%d max:%f min:%f"%(len(var), numpy.max(var), numpy.min(var)))
+        print(str(name) + ' end')
+
     pairs = [(np_train_x, np_train_y), (np_valid_x, np_valid_y), (np_test_x, np_test_y)]
     for pair in pairs:
         if not (len(pair[0]) == len(pair[1])):
             name_x = getVarNames(pair[0], locals())
             name_y = getVarNames(pair[1], locals())
             print("WARNING: the lengths of %s & %s are different" % (name_x, name_y))
+
 
 
 if __name__ == '__main__':
