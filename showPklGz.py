@@ -41,16 +41,16 @@ def showDataset(dataset='data/mnist.pkl.gz'):
     np_valid_x0 = np_valid_x[0]
     np_test_x0 = np_test_x[0]
 
-    varNames = "np_train_x[0] np_train_y np_valid_x[0] np_valid_y np_test_x[0] np_test_y".split(" ")
-    for varName in varNames:
-        var = eval(varName)
-        print(varName)
-        print("len:" + str(len(var)))
-        pprint(var)
-
-    for varName in varNames: #print again for convenience
-        var = eval(varName)
-        print(varName + " len:" + str(len(var)))
+    #varNames = "np_train_x[0] np_train_y np_valid_x[0] np_valid_y np_test_x[0] np_test_y".split(" ")
+    #for varName in varNames:
+    #    var = eval(varName)
+    #    print(varName)
+    #    print("len:" + str(len(var)))
+    #    pprint(var)
+    #
+    #for varName in varNames: #print again for convenience
+    #    var = eval(varName)
+    #    print(varName + " len:" + str(len(var)))
 
     vars = [np_train_x0, np_train_y, np_valid_x0, np_valid_y, np_test_x0, np_test_y]
     var_names = locals()

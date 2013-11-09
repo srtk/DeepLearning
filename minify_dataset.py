@@ -18,6 +18,7 @@ sys.path.append('tutorial_code')
 from logistic_sgd import load_data
 from my_theano_util import theanoTensor2NumpyArray
 
+
 def minifyDataset(input, output, minify_rate=0.01):
     usage = 'usage: minify_dataset.py <input_file> <output_file>'
     if not input:
@@ -29,7 +30,9 @@ def minifyDataset(input, output, minify_rate=0.01):
     if not output:
         print(usage)
         return False
-
+    if os.path.exists(output):
+        print('output file ' + output + ' already exists')
+        return False
     print('read ' + input)
     datasets = load_data(input)
     
@@ -45,15 +48,15 @@ def minifyDataset(input, output, minify_rate=0.01):
     mini_valid_len = int(math.floor(orig_valid_len * minify_rate))
     mini_test_len = int(math.floor(orig_test_len * minify_rate))
 
-    minified_train_x = theanoTensor2NumpyArray(train_set_x[0:mini_train_len:1])
-    minified_valid_x = theanoTensor2NumpyArray(valid_set_x[0:mini_valid_len:1])
-    minified_test_x = theanoTensor2NumpyArray(test_set_x[0:mini_test_len:1])
+    minified_train_x = theanoTensor2NumpyArray(train_set_x[0:mini_train_len])
+    minified_valid_x = theanoTensor2NumpyArray(valid_set_x[0:mini_valid_len])
+    minified_test_x = theanoTensor2NumpyArray(test_set_x[0:mini_test_len])
     
-    minified_train_y = theanoTensor2NumpyArray(train_set_y[0:mini_train_len:1])
-    minified_valid_y = theanoTensor2NumpyArray(train_set_y[0:mini_valid_len:1])
-    minified_test_y = theanoTensor2NumpyArray(train_set_y[0:mini_test_len:1])
-
-    data = (minified_train_x, minified_train_y),(minified_valid_x, minified_valid_y), (minified_test_x, minified_test_y)
+    minified_train_y = theanoTensor2NumpyArray(train_set_y[0:mini_train_len])
+    minified_valid_y = theanoTensor2NumpyArray(valid_set_y[0:mini_valid_len])
+    minified_test_y = theanoTensor2NumpyArray(test_set_y[0:mini_test_len])
+    
+    data = ((minified_train_x, minified_train_y),(minified_valid_x, minified_valid_y), (minified_test_x, minified_test_y))
 
     f = gzip.open(output, 'wb')
     cPickle.dump(data, f, -1)
@@ -66,8 +69,7 @@ def minifyDataset(input, output, minify_rate=0.01):
 if __name__ == '__main__':
     parser = OptionParser()
     (options, args) = parser.parse_args()
-
-    input = args[0] if args[0] else 'data/cifar10_dlt_compatible.pkl.gz'
-    output = args[1] if args[1] else 'data/cifar10_dlt_compatible_100.pkl.gz'
+    input = args[0] if args[0] else None
+    output = args[1] if args[1] else None
     minifyDataset(input=input, output=output)
 
