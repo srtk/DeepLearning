@@ -19,7 +19,7 @@ def getVarNamesG(obj):
 
 def timestamp():
     now = datetime.datetime.today()
-    return "%s %s %s %s:%s:%s.%s" % (now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond)
+    return "%s/%s/%s %02d:%02d:%02d.%s" % (now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond)
 
 if __name__ == '__main__':
     a = [0,1,2]
