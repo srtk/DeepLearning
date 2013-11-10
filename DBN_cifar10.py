@@ -410,6 +410,6 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=100,
 
 if __name__ == '__main__':
     print(timestamp())
-    test_DBN(dataset='data/cifar10_for_dlt_100.pkl.gz',
+    test_DBN(dataset='data/cifar10_for_dlt.pkl.gz',
              n_ins=3*32*32)
     print(timestamp())
