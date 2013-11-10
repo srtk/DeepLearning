@@ -55,7 +55,7 @@ def minifyDataset(input, output, minify_rate=0.01):
     minified_train_y = theanoTensor2NumpyArray(train_set_y[0:mini_train_len])
     minified_valid_y = theanoTensor2NumpyArray(valid_set_y[0:mini_valid_len])
     minified_test_y = theanoTensor2NumpyArray(test_set_y[0:mini_test_len])
-    
+
     data = ((minified_train_x, minified_train_y),(minified_valid_x, minified_valid_y), (minified_test_x, minified_test_y))
 
     f = gzip.open(output, 'wb')

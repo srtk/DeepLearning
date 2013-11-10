@@ -59,7 +59,7 @@ def showDataset(dataset='data/mnist.pkl.gz'):
         print(str(name) + ' start')
         pprint(var)
         print("len:%d max:%f min:%f"%(len(var), numpy.max(var), numpy.min(var)))
-        print(str(name) + ' end')
+        print(str(name) + ' end\n')
 
     pairs = [(np_train_x, np_train_y), (np_valid_x, np_valid_y), (np_test_x, np_test_y)]
     for pair in pairs:
