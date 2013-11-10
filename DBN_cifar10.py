@@ -12,9 +12,13 @@ import theano
 import theano.tensor as T
 from theano.tensor.shared_randomstreams import RandomStreams
 
+sys.path.append('tutorial_code')
+
 from logistic_sgd import LogisticRegression, load_data
 from mlp import HiddenLayer
 from rbm import RBM
+
+from my_python_util import timestamp
 
 
 class DBN(object):
@@ -257,7 +261,8 @@ class DBN(object):
 
 def test_DBN(finetune_lr=0.1, pretraining_epochs=100,
              pretrain_lr=0.01, k=1, training_epochs=1000,
-             dataset='../data/mnist.pkl.gz', batch_size=10):
+             dataset='../data/mnist.pkl.gz', batch_size=10,
+             n_ins=28*28):
     """
     Demonstrates how to train and test a Deep Belief Network.
 
@@ -292,7 +297,7 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=100,
     numpy_rng = numpy.random.RandomState(123)
     print '... building the model'
     # construct the Deep Belief Network
-    dbn = DBN(numpy_rng=numpy_rng, n_ins=28 * 28,
+    dbn = DBN(numpy_rng=numpy_rng, n_ins=n_ins,
               hidden_layers_sizes=[1000, 1000, 1000],
               n_outs=10)
 
@@ -404,4 +409,7 @@ def test_DBN(finetune_lr=0.1, pretraining_epochs=100,
 
 
 if __name__ == '__main__':
-    test_DBN(dataset='data/cifar10_for_dlt_100.pkl.gz')
+    print(timestamp())
+    test_DBN(dataset='data/cifar10_for_dlt_100.pkl.gz',
+             n_ins=3*32*32)
+    print(timestamp())
