@@ -151,28 +151,19 @@ def load_data(dataset):
     :param dataset: the path to the dataset (here MNIST)
     '''
 
-    '''
-    edited to improve convenience
-    '''
-
     #############
     # LOAD DATA #
     #############
 
-    ## Download the MNIST dataset if it is not present
-    # Disable auto downloading
-
+    # Download the MNIST dataset if it is not present
     data_dir, data_file = os.path.split(dataset)
-    if (not os.path.isfile(dataset)):
-        print ("dataset %s not found. abort" % dataset)
-        exit(1)
-    #if (not os.path.isfile(dataset)) and data_file == 'mnist.pkl.gz':
-    #    import urllib
-    #    origin = 'http://www.iro.umontreal.ca/~lisa/deep/data/mnist/mnist.pkl.gz'
-    #    print 'Downloading data from %s' % origin
-    #    urllib.urlretrieve(origin, dataset)
+    if (not os.path.isfile(dataset)) and data_file == 'mnist.pkl.gz':
+        import urllib
+        origin = 'http://www.iro.umontreal.ca/~lisa/deep/data/mnist/mnist.pkl.gz'
+        print 'Downloading data from %s' % origin
+        urllib.urlretrieve(origin, dataset)
 
-    print '... loading data from %s' % dataset
+    print '... loading data'
 
     # Load the dataset
     f = gzip.open(dataset, 'rb')
