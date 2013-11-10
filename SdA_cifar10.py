@@ -36,7 +36,6 @@ import sys
 import time
 
 import numpy
-
 import theano
 import theano.tensor as T
 from theano.tensor.shared_randomstreams import RandomStreams
@@ -47,6 +46,7 @@ from logistic_sgd import LogisticRegression, load_data
 from mlp import HiddenLayer
 from dA import dA
 
+from my_python_util import timestamp
 
 class SdA(object):
     """Stacked denoising auto-encoder class (SdA)
@@ -444,6 +444,9 @@ def test_SdA(finetune_lr=0.1, pretraining_epochs=15,
 
 
 if __name__ == '__main__':
+    print(timestamp())
     test_SdA(dataset='data/cifar10_for_dlt_100.pkl.gz',
              n_ins=3072,
              n_outs=10)
+    print(timestamp())
+
