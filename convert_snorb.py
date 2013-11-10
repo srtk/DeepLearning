@@ -40,12 +40,17 @@ def convert_small_norb(output='data/smallnorb_for_dlt.pkl.gz'):
      The corresponding "-cat" file contains 24,300 category labels
      (0 for animal, 1 for human, 2 for plane, 3 for truck, 4 for car).
     """
-    f = open_file(train_cat)
+    f = open_file(train_dat)
     try:
         #header
         # The magic number encodes the element type of the matrix:
-        magic, ndim, dim0, dim1, dim2, dim3 = struct.unpack('<iiiiii', f.read(4*6))
-        
+        #magic, ndim, dim0, dim1, dim2, dim3 = struct.unpack('<iiiiii', f.read(4*6))
+        magic, ndim = struct.unpack('<ii', f.read(4*2))
+        dims = []
+        for i in range(0, max([ndim, 3])):
+            dims.extend(struct.unpack('<i', f.read(4)))
+
+        print('bp placehoder')
 
     except Exception as e:
         pprint (e)
