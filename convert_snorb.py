@@ -59,20 +59,19 @@ def convert_small_norb(output='data/smallnorb_for_dlt.pkl.gz'):
     dims = []
     for i in range(0, n_dim_info):
         dims.extend(struct.unpack('<i', f.read(4)))
+    dims = dims[:ndim]
+
+    n_values_in_data = reduce(operator.mul, dims[1:]) if (len(dims) > 2) else 1
+    unpack_format = '<%dI' % n_values_in_data
+    datas = []
+    #for data_index in range(0, dims[0]):
+    for data_index in range(0, 9):
+        tmp =struct.unpack(unpack_format, f.read(4 * n_values_in_data))
+        datas.append(list(tmp))
 
     f.close()
-
-    #construct dtype for numpy
-    header_format = [('magic', np.uint32)]
-    header_format.extend([('dim'+str(i), np.uint32) for i in range(0, ndim)])
-    n_data = reduce(operator.mul, dims)
-    dt = np.dtype([('header', header_format), ('data', np.uint32)])
-
-    #read the file again using numpy
-    array = np.fromfile(train_dat, dtype=dt)
 
     print('bp placehoder')
-    f.close()
 
     exit(0)
 
