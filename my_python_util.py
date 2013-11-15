@@ -14,9 +14,9 @@ def getVarNames(obj, preLocals):
 def getVarNamesG(obj):
     return [k for k, v in globals().items() if id(obj) == id(v)]
 
-# return "maximum resident set size" using the system call "getrusage"
-# In MacOSX, "getrusage" gives us the size in bytes, and then this method returns in MBs
-# the unit of values may vary depends on what your system's "getrusage" returns
+
+# In MacOSX, this method returns "maximum resident set size" in MBs
+# In other systems, the unit may vary depends on what your system's "getrusage" returns
 # see "man getrusage" for exact information
 def maxMemoryUsed():
     import resource
