@@ -12,12 +12,15 @@ def getVarNames(obj, preLocals):
 
 #print getVarNamesG(a)
 def getVarNamesG(obj):
-    return  [k for k, v in globals().items() if id(obj) == id(v)]
+    return [k for k, v in globals().items() if id(obj) == id(v)]
 
-# http://pythonforbiologists.com/index.php/measuring-memory-usage-in-python/
-def memoryUsage():
+# return "maximum resident set size" using the system call "getrusage"
+# In MacOSX, "getrusage" gives us the size in bytes, and then this method returns in MBs
+# the unit of values may vary depends on what your system's "getrusage" returns
+# see "man getrusage" for exact information
+def maxMemoryUsed():
     import resource
-    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1000
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024.*1024.)
 
 
 def timestamp():
