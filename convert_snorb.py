@@ -9,8 +9,10 @@ from pprint import pprint
 import struct
 import operator
 
-import numpy as np
+import numpy
 import theano
+
+from my_python_util import maxMemoryUsed
 
 def check_file(file):
     print('reading data from  ' + file)
@@ -59,11 +61,18 @@ def read_from_datafile(file):
     unpack_datatype = 'B'
     unpack_format = '<%d%s' % (n_values_in_data, unpack_datatype)
     datas = []
-    #for data_index in range(0, dim[0]):
-    for data_index in range(0, 3):
+    #for data_index in range(0, dims[0]):
+    for data_index in range(0, 2000):
         #the values stored as uint8
-        tmp = struct.unpack(unpack_format, f.read(value_size * n_values_in_data))
-        datas.append(list(tmp))
+        print("%d : %f" % (data_index, maxMemoryUsed()))
+        tup = struct.unpack(unpack_format, f.read(value_size * n_values_in_data))
+        print("%d : %f" % (data_index, maxMemoryUsed()))
+        l = numpy.array(tup, copy=False)
+        print("%d : %f" % (data_index, maxMemoryUsed()))
+        datas.append(l)
+        print("%d : %f" % (data_index, maxMemoryUsed()))
+        #tmp = None
+        print("%d : %f" % (data_index, maxMemoryUsed()))
 
     f.close()
     return datas
@@ -79,10 +88,10 @@ def read_from_categoryfile(file):
     unpack_datatype = 'i'
     unpack_format = '<%d%s' % (n_values_in_data, unpack_datatype)
     datas = []
-    for data_index in range(0, dims[0]):
+    #for data_index in range(0, dims[0]):
+    for data_index in range(0, 100):
         #the values stored as uint32
-        tmp = struct.unpack(unpack_format, f.read(value_size * n_values_in_data))
-        datas.append(list(tmp))
+        datas.append(list(struct.unpack(unpack_format, f.read(value_size * n_values_in_data))))
 
     f.close()
     return datas
@@ -102,16 +111,15 @@ def convert_small_norb(output='data/smallnorb_for_dlt.pkl.gz'):
     input_dir = 'data'
     train_dat = os.path.join(input_dir, 'smallnorb-5x46789x9x18x6x2x96x96-training-dat.mat.gz')
     train_cat = os.path.join(input_dir, 'smallnorb-5x46789x9x18x6x2x96x96-training-cat.mat.gz')
-    train_info = os.path.join(input_dir, 'smallnorb-5x46789x9x18x6x2x96x96-training-info.mat.gz')
+    #train_info = os.path.join(input_dir, 'smallnorb-5x46789x9x18x6x2x96x96-training-info.mat.gz')
     test_dat = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-dat.mat.gz')
     test_cat = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-cat.mat.gz')
-    test_info = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-info.mat.gz')
+    #test_info = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-info.mat.gz')
 
-    arr_train_dat = read_from_datafile(train_dat)
-    arr_train_cat = read_from_categoryfile(train_cat)
-    print('bp placehoder')
+    train_datas = read_from_datafile(train_dat)
+    train_labels = read_from_categoryfile(train_cat)
 
-    exit(0)
+    #exit(0)
 
     print('reformating datas...')
 
@@ -123,19 +131,27 @@ def convert_small_norb(output='data/smallnorb_for_dlt.pkl.gz'):
     #numpy.ndarray of 1 dimensions (vector)) that have the same length as
     #the number of rows in the input. It should give the target
     #target to the example with the same index in the input.
-    n_data = 50000
-    n_train_set = 41666 #same proportion as mnist 50000 / (50000+10000)
+    n_data = len(train_datas)
+    n_train_set = int(n_data * (50000 / (50000+10000))) #same proportion as mnist 50000 / (50000+10000)
 
-    #MNIST pixel datas vary from 0 to (255.0/256.0), CIFAR-10 from 0 to 255
+    #MNIST pixel datas vary from 0 to (255.0/256.0), small NORB from 0 to 255
+    print("before division : %f" % (maxMemoryUsed()))
+    train_x = numpy.asarray(numpy.divide(train_datas[:n_train_set], 256.))
+    #train_x = numpy.asarray(train_datas[:n_train_set])
+    valid_x = numpy.asarray(numpy.divide(train_datas[n_train_set:], 256.))
+    #valid_x = numpy.asarray(train_datas[n_train_set:])
+    train_y = numpy.asarray(train_labels[:n_train_set])
+    valid_y = numpy.asarray(train_labels[n_train_set:])
+    print("after division : %f" % (maxMemoryUsed()))
 
+    print('tmp')
+    exit(0)
+    test_datas = read_from_datafile(test_dat)
+    test_labals = read_from_categoryfile(test_cat)
 
-    train_x = numpy.divide(numpy.asarray(datas[:n_train_set]), 256.)
-    valid_x = numpy.divide(numpy.asarray(datas[n_train_set:]), 256.)
-    test_x = numpy.divide(numpy.asarray(test_dir['data']), 256.)
-
-    train_y = numpy.asarray(labels[:n_train_set])
-    valid_y = numpy.asarray(labels[n_train_set:])
-    test_y = numpy.asarray(numpy.asarray(test_dir['labels']))
+    #test_x = numpy.asarray(numpy.divide(test_datas, 256.))
+    test_x = numpy.asarray(test_datas)
+    test_y = numpy.asarray(numpy.asarray(test_labals))
 
     train_set = (train_x, train_y)
     valid_set = (valid_x, valid_y)
