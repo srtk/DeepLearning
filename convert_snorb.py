@@ -62,7 +62,7 @@ def read_from_file(file, value_size, unpack_datatype, sizes=None):
         for data_index in range(0, size):
             print("%d : %f" % (data_index, maxMemoryUsed()))
             inner_datas.append(struct.unpack(unpack_format, f.read(value_size * n_values_in_data)))
-        datas.append(inner_datas)
+        datas.append(np.asarray(inner_datas, dtype=np.uint8))
 
     f.close()
     return datas
@@ -94,53 +94,21 @@ def convert_small_norb(output='data/smallnorb_for_dlt.pkl.gz'):
     test_cat = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-cat.mat.gz')
     #test_info = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-info.mat.gz')
 
-    #size = 1000
     n_data = 24300
+    #n_data = 1000
     n_train_set = int(n_data * 50000. / (50000.+10000.)) #same proportion as mnist's 50000 / (50000+10000)
     n_valid_set = n_data - n_train_set
-
     sizes = [n_train_set, n_valid_set]
-    train_datas = read_from_datafile(train_dat, sizes)
-    train_labels = read_from_categoryfile(train_cat, sizes)
-
-    #exit(0)
-
-    print('reformating datas...')
-
-    #description in logistic_sgd.py
-
-    #train_set, valid_set, test_set format: tuple(input, target)
-    #input is an numpy.ndarray of 2 dimensions (a matrix)
-    #witch row's correspond to an example. target is a
-    #numpy.ndarray of 1 dimensions (vector)) that have the same length as
-    #the number of rows in the input. It should give the target
-    #target to the example with the same index in the input.
-
-    #MNIST pixel datas vary from 0 to (255.0/256.0), small NORB from 0 to 255
-    print("before slice : %f" % (maxMemoryUsed()))
-    #train_x = np.divide(train_datas[:n_train_set], 256.)
-    train_x = np.asarray(train_datas[0])
-    print("after slice : %f" % (maxMemoryUsed()))
-    #valid_x = np.divide(train_datas[n_train_set:], 256.)
-    valid_x = np.asarray(train_datas[1])
-    print("after slice : %f" % (maxMemoryUsed()))
-    train_y = np.asarray(train_labels[0])
-    print("after slice : %f" % (maxMemoryUsed()))
-    valid_y = np.asarray(train_labels[1])
-    print("after slice : %f" % (maxMemoryUsed()))
-    exit(0)
-
-    test_datas = read_from_datafile(test_dat)
-    test_labals = read_from_categoryfile(test_cat)
-
-    #test_x = np.asarray(np.divide(test_datas, 256.))
-    test_x = np.asarray(test_datas)
-    test_y = np.asarray(np.asarray(test_labals))
+    train_x, valid_x = read_from_datafile(train_dat, sizes)
+    train_y, valid_y = read_from_categoryfile(train_cat, sizes)
+    #test_x = read_from_datafile(test_dat, [n_data])
+    #test_y = read_from_categoryfile(test_cat, [n_data])
 
     train_set = (train_x, train_y)
     valid_set = (valid_x, valid_y)
-    test_set = (test_x, test_y)
-    to_pickle = (train_set, valid_set, test_set)
+    #test_set = (test_x, test_y)
+    #to_pickle = (train_set, valid_set, test_set)
+    to_pickle = (train_set, valid_set)
 
     print('start pickling...')
     f = gzip.open(output, 'wb')
