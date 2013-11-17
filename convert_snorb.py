@@ -57,11 +57,7 @@ def read_from_file(file, value_size, unpack_datatype, sizes=None):
     datas = []
     sizes = sizes if sizes else [dims[0]]
     for size in sizes:
-        #inner_datas = [struct.unpack(unpack_format, f.read(value_size * n_values_in_data)) for i in range(0, size)]
-        inner_datas = []
-        for data_index in range(0, size):
-            print("%d : %f" % (data_index, maxMemoryUsed()))
-            inner_datas.append(struct.unpack(unpack_format, f.read(value_size * n_values_in_data)))
+        inner_datas = [struct.unpack(unpack_format, f.read(value_size * n_values_in_data)) for i in range(0, size)]
         datas.append(np.asarray(inner_datas, dtype=np.uint8))
 
     f.close()
@@ -94,21 +90,21 @@ def convert_small_norb(output='data/smallnorb_for_dlt.pkl.gz'):
     test_cat = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-cat.mat.gz')
     #test_info = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-info.mat.gz')
 
-    n_data = 24300
-    #n_data = 1000
+    #n_data = 24300
+    n_data = 1000
     n_train_set = int(n_data * 50000. / (50000.+10000.)) #same proportion as mnist's 50000 / (50000+10000)
     n_valid_set = n_data - n_train_set
-    sizes = [n_train_set, n_valid_set]
-    train_x, valid_x = read_from_datafile(train_dat, sizes)
-    train_y, valid_y = read_from_categoryfile(train_cat, sizes)
-    #test_x = read_from_datafile(test_dat, [n_data])
-    #test_y = read_from_categoryfile(test_cat, [n_data])
+    sizes_for_train_file = [n_train_set, n_valid_set]
+    sizes_for_test_file = [n_data]
+    train_x, valid_x = read_from_datafile(train_dat, sizes_for_train_file)
+    train_y, valid_y = read_from_categoryfile(train_cat, sizes_for_train_file)
+    test_x = read_from_datafile(test_dat, sizes_for_test_file)
+    test_y = read_from_categoryfile(test_cat, sizes_for_test_file)
 
     train_set = (train_x, train_y)
     valid_set = (valid_x, valid_y)
-    #test_set = (test_x, test_y)
-    #to_pickle = (train_set, valid_set, test_set)
-    to_pickle = (train_set, valid_set)
+    test_set = (test_x, test_y)
+    to_pickle = (train_set, valid_set, test_set)
 
     print('start pickling...')
     f = gzip.open(output, 'wb')
