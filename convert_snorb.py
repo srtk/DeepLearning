@@ -85,10 +85,8 @@ def convert_small_norb(output='data/smallnorb_for_dlt.pkl.gz'):
     input_dir = 'data'
     train_dat = os.path.join(input_dir, 'smallnorb-5x46789x9x18x6x2x96x96-training-dat.mat.gz')
     train_cat = os.path.join(input_dir, 'smallnorb-5x46789x9x18x6x2x96x96-training-cat.mat.gz')
-    #train_info = os.path.join(input_dir, 'smallnorb-5x46789x9x18x6x2x96x96-training-info.mat.gz')
     test_dat = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-dat.mat.gz')
     test_cat = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-cat.mat.gz')
-    #test_info = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-info.mat.gz')
 
     n_data = 24300
     n_train_set = int(n_data * 50000. / (50000.+10000.)) #same proportion as mnist's 50000 / (50000+10000)
@@ -115,3 +113,4 @@ def convert_small_norb(output='data/smallnorb_for_dlt.pkl.gz'):
 
 if __name__ == '__main__':
     convert_small_norb()
+    print("max memory used: %f MB"%maxMemoryUsed())
