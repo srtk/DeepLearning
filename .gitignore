@@ -1,3 +1,3 @@
 *.pyc
-data/*
-.idea/workspace.xml
+DLTutorial/data/*
+DLTutorial/.idea/workspace.xml
