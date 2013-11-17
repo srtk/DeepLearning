@@ -90,16 +90,15 @@ def convert_small_norb(output='data/smallnorb_for_dlt.pkl.gz'):
     test_cat = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-cat.mat.gz')
     #test_info = os.path.join(input_dir, 'smallnorb-5x01235x9x18x6x2x96x96-testing-info.mat.gz')
 
-    #n_data = 24300
-    n_data = 1000
+    n_data = 24300
     n_train_set = int(n_data * 50000. / (50000.+10000.)) #same proportion as mnist's 50000 / (50000+10000)
     n_valid_set = n_data - n_train_set
     sizes_for_train_file = [n_train_set, n_valid_set]
     sizes_for_test_file = [n_data]
     train_x, valid_x = read_from_datafile(train_dat, sizes_for_train_file)
     train_y, valid_y = read_from_categoryfile(train_cat, sizes_for_train_file)
-    test_x = read_from_datafile(test_dat, sizes_for_test_file)
-    test_y = read_from_categoryfile(test_cat, sizes_for_test_file)
+    test_x, = read_from_datafile(test_dat, sizes_for_test_file)
+    test_y, = read_from_categoryfile(test_cat, sizes_for_test_file)
 
     train_set = (train_x, train_y)
     valid_set = (valid_x, valid_y)
